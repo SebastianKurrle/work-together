@@ -32,7 +32,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             last_name=last_name
         )
 
-        user.set_password(validated_data.get('password'))
+        user.set_password(password)
         user.save()
 
         return user

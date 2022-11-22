@@ -40,22 +40,5 @@ def register_api(request):
     serializer = RegisterSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
-    user = serializer.save()
-    _, token = AuthToken.objects.create(user)
-
-    return Response({
-        'user_info' : {
-            'id' : user.id,
-            'username': user.username
-        },
-
-        'token' : token
-    })
-
-@api_view(['GET'])
-def test(request):
-    user = request.user
-    return Response({
-        'user' : user.username
-    })
-
+    serializer.save()
+    return Response(status=200)
