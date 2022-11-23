@@ -11,7 +11,7 @@
           <div class="card-body">
             <h5 class="card-title">Description</h5>
             <p class="card-text">{{ org.description }}</p>
-            <a href="#" class="btn btn-primary">Visit</a>
+            <router-link :to="org.get_absolute_url" class="btn btn-primary">Visit</router-link>
           </div>
         </div>
       </div>
