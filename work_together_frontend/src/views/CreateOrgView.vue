@@ -69,7 +69,7 @@ export default {
         await axios
           .post("/api/org/create/", formData)
           .then((response) => {
-            this.$router.push('/')
+            this.$router.push('/organizations')
           })
           .catch((error) => {
             console.log(error);

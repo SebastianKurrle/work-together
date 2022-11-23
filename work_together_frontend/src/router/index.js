@@ -6,6 +6,7 @@ import RegisterView from '../views/RegisterView.vue'
 import LoginView from '../views/LoginView.vue'
 import AccountView from '../views/AccountView.vue'
 import CreateOrgView from '../views/CreateOrgView.vue'
+import OrgsView from '../views/OrgsView.vue'
 
 const routes = [
   {
@@ -36,6 +37,14 @@ const routes = [
     path: '/organization/create',
     name: 'org-create',
     component: CreateOrgView,
+    meta: {
+      requireLogin: true
+    }
+  },
+  {
+    path: '/organizations',
+    name: 'orgs',
+    component: OrgsView,
     meta: {
       requireLogin: true
     }
