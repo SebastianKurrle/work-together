@@ -34,4 +34,8 @@ class DetailOrganization(APIView):
     def get(self, request, org_slug, format=None):
         org = self.get_object(org_slug)
         serializer = OrganizationSerializer(org)
-        return Response(serializer.data)
+        is_owner = request.user.id == org.owner.id
+        return Response(data={
+            'org' : serializer.data,
+            'is_owner' : is_owner
+        })

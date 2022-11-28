@@ -3,7 +3,7 @@
     <h5 class="text-center">Your Organizations</h5>
 
     <div class="container text-center mt-3 border p-3">
-      <div class="row row-cols-3">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3">
         <div class="card m-3" v-for="org in organizations" :key="org.id">
           <div class="card-header">
             {{ org.name }}

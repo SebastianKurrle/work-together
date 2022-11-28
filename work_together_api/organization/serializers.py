@@ -9,7 +9,7 @@ class OrganizationSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'description',
-            'get_absolute_url'
+            'get_absolute_url',
         )
 
         extra_kwargs = {
@@ -21,7 +21,7 @@ class OrganizationSerializer(serializers.ModelSerializer):
                 ]
             },
         }
-    
+
     def create(self, validated_data):
         name = validated_data.get('name')
         desc = validated_data.get('description')
