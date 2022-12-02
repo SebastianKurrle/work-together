@@ -23,13 +23,36 @@
                     </p>
                 </div>
                 <hr/>
-                <button v-if="isOwner" data-bs-dismiss="modal" class="btn btn-success" @click="$router.push(`${org.get_absolute_url}add-member`)">Add member</button>
-                <button v-else class="btn btn-danger" data-bs-dismiss="modal">Leave</button>
+                <button class="btn btn-success" v-if="isOwner" data-bs-target="#createWorkspaceModal" data-bs-toggle="modal" data-bs-dismiss="modal">Create Workspace</button>
+                <button class="btn btn-danger" v-else data-bs-dismiss="modal">Leave</button>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createWorkspaceModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="createWorkspaceModal">Create Workspace</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label for="name" class="form-label">Name:</label>
+                <input type="text" id="name" class="form-control">
+
+                <label for="desc" class="form-label">Description</label>
+                <input type="text" class="form-control" id="desc">
+
+                <button class="btn btn-success mt-3">Create</button>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-primary" data-bs-target="#staticBackdrop" data-bs-toggle="modal" data-bs-dismiss="modal">Back to options</button>
+            </div>
+          </div>
         </div>
     </div>
 
