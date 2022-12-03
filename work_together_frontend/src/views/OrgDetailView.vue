@@ -41,13 +41,19 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <label for="name" class="form-label">Name:</label>
-                <input type="text" id="name" class="form-control">
+                <form @submit.prevent="submitForm">
+                    <label for="name" class="form-label">Name:</label>
+                    <input type="text" id="name" class="form-control" v-model="workspaceName">
 
-                <label for="desc" class="form-label">Description</label>
-                <input type="text" class="form-control" id="desc">
+                    <label for="desc" class="form-label">Description</label>
+                    <input type="text" class="form-control" id="desc" v-model="workspaceDesc">
+                    
+                    <div class="bg-danger text-white p-3 mt-3 rounded" v-if="errors.length">
+                        <p v-for="error in errors" :key="error">{{ error }}</p>
+                    </div>
 
-                <button class="btn btn-success mt-3">Create</button>
+                    <button class="btn btn-success mt-3">Create</button>
+                </form>
             </div>
             <div class="modal-footer">
               <button class="btn btn-primary" data-bs-target="#staticBackdrop" data-bs-toggle="modal" data-bs-dismiss="modal">Back to options</button>
@@ -72,7 +78,10 @@ export default {
     data() {
         return {
             org: {},
-            isOwner: false
+            isOwner: false,
+            workspaceName: '',
+            workspaceDesc: '',
+            errors: []
         }
     },
 
@@ -100,6 +109,25 @@ export default {
                             background: "red",
                         },
                     }).showToast();
+                })
+        },
+
+        async submitForm() {
+            this.errors = []
+
+            const formData = {
+                name: this.workspaceName,
+                description: this.workspaceDesc,
+                organization: this.org.id
+            }
+
+            axios
+                .post('/api/workspace/create/', formData)
+                .then(response => {
+                    console.log(response)
+                })
+                .catch(error => {
+                    console.log(error)
                 })
         }
     },
