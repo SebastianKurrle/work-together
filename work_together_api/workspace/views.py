@@ -17,9 +17,17 @@ class CreateWorkspace(APIView):
         return Response(status=200)
 
 class GetWorkspaces(APIView):
-    def get(self, request, org_id, form=None):
+    def get(self, request, org_id, format=None):
         org = Organization.objects.get(id=org_id)
         workspaces = Workspace.objects.filter(organization=org)
         serializer = WorkspaceSerializer(workspaces, many=True)
+
+        return Response(serializer.data)
+
+class GetWorkspace(APIView):
+    def get(self, request, org_name, ws_name, format=None):
+        org = Organization.objects.get(name=org_name)
+        workspace = Workspace.objects.get(name=ws_name, organization=org)
+        serializer = WorkspaceSerializer(workspace)
 
         return Response(serializer.data)
