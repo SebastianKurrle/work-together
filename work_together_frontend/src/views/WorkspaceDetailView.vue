@@ -8,6 +8,8 @@
 import axios from 'axios';
 
 export default {
+    name: 'WorkspaceDetailView',
+
     data() {
         return {
             workspace: {}
@@ -16,14 +18,21 @@ export default {
 
     methods: {
         async getWorkspace() {
+            const org_slug = this.$route.params.org_slug
+            const workspace_slug = this.$route.params.workspace_slug
+
             axios
-                .get(`/api/workspace/get/$`)
+                .get(`/api/workspace/get/${org_slug}/${workspace_slug}/`)
+                .then(response => {
+                    this.workspace = response.data
+                    console.log(this.workspace)
+                })
         }
     },
 
-    props: {
-        workspaceId: Number
-    }
+    mounted() {
+        this.getWorkspace()
+    },
 }
 </script>
 

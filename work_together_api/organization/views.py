@@ -14,6 +14,11 @@ class CreateOrganization(APIView):
         )
         serializer.is_valid(raise_exception=True)
 
+        org_slug = serializer.validated_data.get('name').lower()
+
+        if Organization.objects.filter(org_slug=org_slug).exists():
+            return Response({'error' : 'This name already exists'})
+
         serializer.save()
         return Response(status=200)
 

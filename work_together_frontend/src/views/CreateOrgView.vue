@@ -68,8 +68,12 @@ export default {
 
         await axios
           .post("/api/org/create/", formData)
-          .then((response) => {
-            this.$router.push('/organizations')
+          .then(response => {
+            if (response.data.error) {
+              this.errors.push(response.data.error)
+            } else {
+              this.$router.push('/organizations')
+            }
           })
           .catch((error) => {
             console.log(error);

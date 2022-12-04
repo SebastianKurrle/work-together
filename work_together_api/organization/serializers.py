@@ -12,16 +12,6 @@ class OrganizationSerializer(serializers.ModelSerializer):
             'get_absolute_url',
         )
 
-        extra_kwargs = {
-            'name' : {
-                'validators' : [
-                    validators.UniqueValidator(
-                        Organization.objects.all()
-                    )
-                ]
-            },
-        }
-
     def create(self, validated_data):
         name = validated_data.get('name')
         desc = validated_data.get('description')
