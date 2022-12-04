@@ -2,9 +2,13 @@
   <div class="mt-3 container">
     <h4 class="text-center">{{ org.name }}</h4>
 
-    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-        Options
-    </button>
+    <div class="mb-3">
+        <button type="button" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+            Options
+        </button>
+
+        <router-link class="btn btn-secondary" to="/organizations">Back</router-link>
+    </div>
     
     <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -41,7 +45,7 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form @submit.prevent="submitForm">
+                <form @submit.prevent="workspaceSubmitForm">
                     <label for="name" class="form-label">Name:</label>
                     <input type="text" id="name" class="form-control" v-model="workspaceName">
 
@@ -64,6 +68,21 @@
 
     <div class="border p-3">
         <h5 class="text-center">Organization Workspaces</h5>
+
+        <div class="container text-center mt-3">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3">
+              <div class="card m-3" v-for="workspace in workspaces" :key="workspace.id">
+                <div class="card-header">
+                  {{ workspace.name }}
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">Description</h5>
+                  <p class="card-text">{{ workspace.description }}</p>
+                  <router-link :to="workspace.get_absolute_url" class="btn btn-primary">Visit</router-link>
+                </div>
+              </div>
+            </div>
+        </div>
     </div>
   </div>
 </template>
@@ -78,6 +97,7 @@ export default {
     data() {
         return {
             org: {},
+            workspaces: [],
             isOwner: false,
             workspaceName: '',
             workspaceDesc: '',
@@ -95,6 +115,7 @@ export default {
                     this.org = response.data.org
                     this.isOwner = response.data.is_owner
                     document.title = this.org.name + ' | WorkTogether'
+                    this.getWorkspaces()
                 })
                 .catch(error => {
                     Toastify({
@@ -112,7 +133,7 @@ export default {
                 })
         },
 
-        async submitForm() {
+        async workspaceSubmitForm() {
             this.errors = []
 
             const formData = {
@@ -121,7 +142,7 @@ export default {
                 organization: this.org.id
             }
 
-            axios
+            await axios
                 .post('/api/workspace/create/', formData)
                 .then(response => {
                     if (response.data.error) {
@@ -144,6 +165,17 @@ export default {
                 })
                 .catch(error => {
                     this.errors.push(error) 
+                })
+        },
+
+        async getWorkspaces() {
+            await axios
+                .get(`/api/org/${this.org.id}/workspace/get/`)
+                .then(response => {
+                    this.workspaces = response.data
+                })
+                .catch(error => {
+                    console.log(error)
                 })
         }
     },
