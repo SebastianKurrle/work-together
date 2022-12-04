@@ -13,11 +13,6 @@ class WorkspaceSerializer(serializers.ModelSerializer):
             'get_absolute_url'
         )
 
-    
-    def is_valid(self, *, raise_exception=False):
-        super().is_valid(raise_exception=raise_exception)
-        return Workspace.objects.filter(name=self.initial_data.get('name')).exists()
-
     def create(self, validated_data):
         name = validated_data.get('name').lower()
         desc = validated_data.get('description')

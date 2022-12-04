@@ -124,10 +124,26 @@ export default {
             axios
                 .post('/api/workspace/create/', formData)
                 .then(response => {
-                    console.log(response)
+                    if (response.data.error) {
+                        this.errors.push(response.data.error)
+                    } else {
+                        Toastify({
+                            text: "Workspace successfuly created",
+                            duration: 3000,
+                            close: true,
+                            gravity: "bottom",
+                            position: "right",
+                            stopOnFocus: true,
+
+                            style: {
+                                background: "green",
+                            },
+                        }).showToast();
+
+                    }
                 })
                 .catch(error => {
-                    console.log(error)
+                    this.errors.push(error) 
                 })
         }
     },

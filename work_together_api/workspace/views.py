@@ -8,7 +8,7 @@ class CreateWorkspace(APIView):
         serializer = WorkspaceSerializer(data=request.data)
         serializer.is_valid()
         workspace_name = serializer.validated_data.get('name')
-        if Workspace.objects.filter(name=workspace_name.lower()).exists():  
+        if Workspace.objects.filter(name=workspace_name.lower()).exists():
             return Response({'error' : 'A workspace with this name already exists'})
 
         serializer.save()
