@@ -1,6 +1,23 @@
 <template>
-  <div>
-    <h1>Workspace</h1>
+  <div class="mt-3 container">
+    <h4 class="text-center">{{ workspace.name }}</h4>
+    <p class="text-center"><b>Description:</b> {{ workspace.description }}</p>
+
+    <div class="border p-3 mb-3">
+        <div class="d-flex flex-column">
+            <button class="btn btn-success mb-3">Show Chat</button>
+            <button class="btn btn-success">Create Post</button>
+        </div>
+    </div>
+
+    <div class="border p-3 mb-3">
+        <h5 class="text-center">File uploads</h5>
+    </div>
+
+    <form enctype="multipart/form-data">
+        <input type="file" ref="file" @change="selectFile" class="form-control mb-3">
+        <button class="btn btn-warning" :disabled="file == ''">Upload</button>
+    </form>
   </div>
 </template>
 
@@ -12,7 +29,8 @@ export default {
 
     data() {
         return {
-            workspace: {}
+            workspace: {},
+            file: ''
         }
     },
 
@@ -25,8 +43,15 @@ export default {
                 .get(`/api/workspace/get/${org_slug}/${workspace_slug}/`)
                 .then(response => {
                     this.workspace = response.data
-                    console.log(this.workspace)
                 })
+        },
+
+        selectFile(event) {
+            if (event.target.files.length > 0) {
+                this.file = event.target.files
+            } else {
+                this.file = ''
+            }
         }
     },
 
