@@ -46,6 +46,7 @@
 
 <script>
 import axios from 'axios';
+import Toastify from "toastify-js";
 
 export default {
     name: 'WorkspaceDetailView',
@@ -98,6 +99,21 @@ export default {
                     })
                     .then(response => {
                         console.log(response)
+                        Toastify({
+                            text: "File has been uploaded",
+                            duration: 3000,
+                            close: true,
+                            gravity: "bottom",
+                            position: "right",
+                            stopOnFocus: true,
+
+                            style: {
+                                background: "green",
+                            },
+                        }).showToast();
+
+                        this.file = '',
+                        this.file_desc = ''
                     })
                     .catch(error => {
                         console.log(error)
