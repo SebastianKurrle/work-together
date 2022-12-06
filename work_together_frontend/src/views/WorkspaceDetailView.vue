@@ -18,11 +18,16 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form enctype="multipart/form-data">
+                <form enctype="multipart/form-data" @submit.prevent="uploadFile" method="POST">
                     <input type="file" ref="file" @change="selectFile" class="form-control mb-3">
 
                     <label for="desc" class="form-label">Description</label>
-                    <textarea id="desc" cols="30" rows="5" class="form-control mb-3"></textarea>
+                    <textarea id="desc" cols="30" rows="5" class="form-control mb-3" v-model="file_desc"></textarea>
+
+                    <div class="bg-danger text-white p-3 mb-3 rounded" v-if="upload_errors.length">
+                        <p v-for="error in upload_errors" :key="error">{{ error }}</p>
+                    </div>
+
                     <button class="btn btn-warning" :disabled="file == ''">Upload</button>
                 </form>
             </div>
@@ -48,7 +53,9 @@ export default {
     data() {
         return {
             workspace: {},
-            file: ''
+            file: '',
+            upload_errors: [],
+            file_desc: ''
         }
     },
 
@@ -66,9 +73,36 @@ export default {
 
         selectFile(event) {
             if (event.target.files.length > 0) {
-                this.file = event.target.files
+                this.file = event.target.files[0]
             } else {
                 this.file = ''
+            }
+        },
+
+        async uploadFile() {
+            this.upload_errors = []
+
+            if (this.file_desc.trim() == '') {
+                this.upload_errors.push('The description field is empty')
+            } else {
+                const formData = {
+                    file: this.file,
+                    description: this.file_desc
+                }
+
+                await axios
+                    .post(`/api/workspace/${this.workspace.id}/file-upload/`, formData, {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        }
+                    })
+                    .then(response => {
+                        console.log(response)
+                    })
+                    .catch(error => {
+                        console.log(error)
+                        this.upload_errors.push('Something went wrong')
+                    })
             }
         }
     },

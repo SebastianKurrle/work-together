@@ -12,3 +12,11 @@ class Workspace(models.Model):
 
     def __str__(self):
         return self.name
+
+class FileUpload(models.Model):
+    file = models.FileField(upload_to='files/')
+    description = models.TextField()
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.file.name

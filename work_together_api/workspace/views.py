@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import WorkspaceSerializer
+from .serializers import WorkspaceSerializer, FileUploadSerializer
 from .models import Workspace
 from organization.models import Organization
 
@@ -31,3 +31,18 @@ class GetWorkspace(APIView):
         serializer = WorkspaceSerializer(workspace)
 
         return Response(serializer.data)
+
+class UploadFile(APIView):
+    def post(self, request, ws_id, format=None):
+        print(request.FILES)
+        workspace = Workspace.objects.get(id=ws_id)
+        serializer = FileUploadSerializer(data=request.data, context={
+            'ws_id' : ws_id
+        })
+        print(request.data)
+        serializer.is_valid()
+        serializer.save()
+
+        return Response(status=200)
+
+
