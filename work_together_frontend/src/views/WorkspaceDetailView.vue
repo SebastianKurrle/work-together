@@ -40,6 +40,14 @@
 
     <div class="border p-3 mb-3">
         <h5 class="text-center">File uploads</h5>
+
+        <div class="card mb-3" v-for="uploadedFile in uploadedFiles" :key="uploadedFile.id">
+            <div class="card-body">
+              <h5 class="card-title">{{ uploadedFile.get_file_name }}</h5>
+              <p>{{ uploadedFile.description }}</p>
+              <a download="" :href="uploadedFile.get_file" class="btn btn-primary">Download</a>
+            </div>
+        </div>
     </div>
   </div>
 </template>
@@ -54,6 +62,7 @@ export default {
     data() {
         return {
             workspace: {},
+            uploadedFiles: [],
             file: '',
             upload_errors: [],
             file_desc: ''
@@ -69,6 +78,7 @@ export default {
                 .get(`/api/workspace/get/${org_slug}/${workspace_slug}/`)
                 .then(response => {
                     this.workspace = response.data
+                    this.getUploadedFiles()
                 })
         },
 
@@ -120,7 +130,19 @@ export default {
                         this.upload_errors.push('Something went wrong')
                     })
             }
-        }
+        },
+
+        async getUploadedFiles() {
+            axios
+                .get(`/api/workspace/${this.workspace.id}/file-get/`)
+                .then(response => {
+                    this.uploadedFiles = response.data
+                    console.log(this.uploadedFiles)
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+        },
     },
 
     mounted() {

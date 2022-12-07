@@ -28,7 +28,9 @@ class FileUploadSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'file',
-            'description'
+            'description',
+            'get_file',
+            'get_file_name'
         )
 
     def create(self, validated_data):
