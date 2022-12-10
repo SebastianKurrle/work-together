@@ -45,7 +45,7 @@
             <div class="card-body">
               <h5 class="card-title">{{ uploadedFile.get_file_name }}</h5>
               <p>{{ uploadedFile.description }}</p>
-              <a download="" :href="uploadedFile.get_file" class="btn btn-primary">Download</a>
+              <button class="btn btn-primary" @click="downloadFile(uploadedFile.get_file, uploadedFile.get_file_name)">Download</button>
             </div>
         </div>
     </div>
@@ -143,6 +143,23 @@ export default {
                     console.log(error)
                 })
         },
+
+        async downloadFile(url, fileName) {
+            axios
+                .get(url, {
+                    responseType: 'blob'
+                })
+                .then(response => {
+                    const fileUrl = window.URL.createObjectURL(new Blob([response.data]))
+                    const fileLink = document.createElement('a')
+
+                    fileLink.href = fileUrl
+                    fileLink.setAttribute('download', fileName)
+                    document.body.appendChild(fileLink)
+
+                    fileLink.click()
+                })
+        }
     },
 
     mounted() {
