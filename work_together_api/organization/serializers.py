@@ -23,7 +23,7 @@ class OrganizationSerializer(serializers.ModelSerializer):
         return org
 
 # Handles the serialization for the join requests
-class JoinRequestCreateSerializer(serializers.ModelSerializer):
+class JoinRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = JoinRequest
         fields = (

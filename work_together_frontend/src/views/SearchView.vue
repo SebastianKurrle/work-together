@@ -54,7 +54,7 @@ export default {
             }
 
             axios
-                .post('/api/org/join-request/', formData)
+                .post('/api/org/user/join-request/', formData)
                 .then(response => {
                     console.log(response)
                     Toastify({
