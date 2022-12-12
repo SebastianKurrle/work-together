@@ -54,6 +54,8 @@ export default {
           axios.defaults.headers.common['Authorization'] = ''
 
           localStorage.removeItem('token')
+          localStorage.removeItem('username')
+          localStorage.removeItem('userId')
 
           const formData = {
               username: this.username,
@@ -70,6 +72,7 @@ export default {
 
                   localStorage.setItem('token', token)
                   localStorage.setItem('username', response.data.user_info.username)
+                  localStorage.setItem('userId', response.data.user_info.id)
 
                   const toPath = this.$route.query.to || '/'
                   this.$router.push(toPath)

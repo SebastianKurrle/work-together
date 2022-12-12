@@ -6,7 +6,8 @@
     <div class="border p-3 mb-3">
         <div class="d-flex flex-column">
             <button class="btn btn-success mb-3">Show Chat</button>
-            <button class="btn btn-success" data-bs-target="#uploadFileModal" data-bs-toggle="modal">Upload File</button>
+            <button class="btn btn-success mb-3" data-bs-target="#uploadFileModal" data-bs-toggle="modal">Upload File</button>
+            <button class="btn btn-warning" @click="$router.push(`/organization/${$route.params.org_slug}`)">Back</button>
         </div>
     </div>
 
@@ -18,11 +19,16 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form enctype="multipart/form-data">
+                <form enctype="multipart/form-data" @submit.prevent="uploadFile" method="POST">
                     <input type="file" ref="file" @change="selectFile" class="form-control mb-3">
 
                     <label for="desc" class="form-label">Description</label>
-                    <textarea id="desc" cols="30" rows="5" class="form-control mb-3"></textarea>
+                    <textarea id="desc" cols="30" rows="5" class="form-control mb-3" v-model="file_desc"></textarea>
+
+                    <div class="bg-danger text-white p-3 mb-3 rounded" v-if="upload_errors.length">
+                        <p v-for="error in upload_errors" :key="error">{{ error }}</p>
+                    </div>
+
                     <button class="btn btn-warning" :disabled="file == ''">Upload</button>
                 </form>
             </div>
@@ -35,12 +41,21 @@
 
     <div class="border p-3 mb-3">
         <h5 class="text-center">File uploads</h5>
+
+        <div class="card mb-3" v-for="uploadedFile in uploadedFiles" :key="uploadedFile.id">
+            <div class="card-body">
+              <h5 class="card-title">{{ uploadedFile.get_file_name }}</h5>
+              <p>{{ uploadedFile.description }}</p>
+              <button class="btn btn-primary" @click="downloadFile(uploadedFile.get_file, uploadedFile.get_file_name)">Download</button>
+            </div>
+        </div>
     </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+import Toastify from "toastify-js";
 
 export default {
     name: 'WorkspaceDetailView',
@@ -48,7 +63,10 @@ export default {
     data() {
         return {
             workspace: {},
-            file: ''
+            uploadedFiles: [],
+            file: '',
+            upload_errors: [],
+            file_desc: ''
         }
     },
 
@@ -61,15 +79,86 @@ export default {
                 .get(`/api/workspace/get/${org_slug}/${workspace_slug}/`)
                 .then(response => {
                     this.workspace = response.data
+                    this.getUploadedFiles()
                 })
         },
 
         selectFile(event) {
             if (event.target.files.length > 0) {
-                this.file = event.target.files
+                this.file = event.target.files[0]
             } else {
                 this.file = ''
             }
+        },
+
+        async uploadFile() {
+            this.upload_errors = []
+
+            if (this.file_desc.trim() == '') {
+                this.upload_errors.push('The description field is empty')
+            } else {
+                const formData = {
+                    file: this.file,
+                    description: this.file_desc
+                }
+
+                await axios
+                    .post(`/api/workspace/${this.workspace.id}/file-upload/`, formData, {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        }
+                    })
+                    .then(response => {
+                        console.log(response)
+                        Toastify({
+                            text: "File has been uploaded",
+                            duration: 3000,
+                            close: true,
+                            gravity: "bottom",
+                            position: "right",
+                            stopOnFocus: true,
+
+                            style: {
+                                background: "green",
+                            },
+                        }).showToast();
+
+                        this.file = '',
+                        this.file_desc = ''
+                    })
+                    .catch(error => {
+                        console.log(error)
+                        this.upload_errors.push('Something went wrong')
+                    })
+            }
+        },
+
+        async getUploadedFiles() {
+            axios
+                .get(`/api/workspace/${this.workspace.id}/file-get/`)
+                .then(response => {
+                    this.uploadedFiles = response.data
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+        },
+
+        async downloadFile(url, fileName) {
+            axios
+                .get(url, {
+                    responseType: 'blob'
+                })
+                .then(response => {
+                    const fileUrl = window.URL.createObjectURL(new Blob([response.data]))
+                    const fileLink = document.createElement('a')
+
+                    fileLink.href = fileUrl
+                    fileLink.setAttribute('download', fileName)
+                    document.body.appendChild(fileLink)
+
+                    fileLink.click()
+                })
         }
     },
 

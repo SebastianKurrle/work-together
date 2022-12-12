@@ -1,5 +1,6 @@
 from django.db import models
 from organization.models import Organization
+import os
 
 class Workspace(models.Model):
     name = models.CharField(max_length=255)
@@ -12,3 +13,17 @@ class Workspace(models.Model):
 
     def __str__(self):
         return self.name
+
+class FileUpload(models.Model):
+    file = models.FileField(upload_to='files/')
+    description = models.TextField()
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.file.name
+
+    def get_file(self):
+        return 'http://127.0.0.1:8000/media/' + str(self.file)
+
+    def get_file_name(self):
+        return os.path.basename(self.file.name)

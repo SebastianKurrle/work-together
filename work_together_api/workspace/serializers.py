@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Workspace
+from .models import Workspace, FileUpload
 from organization.models import Organization
 
 class WorkspaceSerializer(serializers.ModelSerializer):
@@ -21,4 +21,24 @@ class WorkspaceSerializer(serializers.ModelSerializer):
 
         workspace = Workspace.objects.create(name=name, description=desc, slug=slug, organization=org)
         return workspace
-        
+
+class FileUploadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FileUpload
+        fields = (
+            'id',
+            'file',
+            'description',
+            'get_file',
+            'get_file_name'
+        )
+
+    def create(self, validated_data):
+        file = validated_data.get('file')
+        desc = validated_data.get('description')
+        ws_id = self.context.get('ws_id')
+        workspace = Workspace.objects.get(id=ws_id)
+
+        file_upload = FileUpload.objects.create(file=file, description=desc, workspace=workspace)
+        return file_upload
+

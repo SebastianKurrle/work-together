@@ -9,6 +9,7 @@ import CreateOrgView from '../views/CreateOrgView.vue'
 import OrgsView from '../views/OrgsView.vue'
 import OrgDetailView from '../views/OrgDetailView.vue'
 import WorkspaceDetailView from '../views/WorkspaceDetailView.vue'
+import SearchView from '../views/SearchView.vue'
 
 const routes = [
   {
@@ -63,6 +64,14 @@ const routes = [
     path: '/organization/:org_slug/:workspace_slug',
     name: 'workspace-detail',
     component: WorkspaceDetailView,
+    meta: {
+      requireLogin: true
+    },
+  },
+  {
+    path: '/search',
+    name: 'search',
+    component: SearchView,
     meta: {
       requireLogin: true
     },

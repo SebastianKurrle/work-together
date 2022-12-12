@@ -1,7 +1,8 @@
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import OrganizationSerializer
-from .models import Organization
+from .serializers import OrganizationSerializer, JoinRequestCreateSerializer
+from .models import Organization, JoinRequest
 from django.http import Http404
 
 class CreateOrganization(APIView):
@@ -44,3 +45,29 @@ class DetailOrganization(APIView):
             'org' : serializer.data,
             'is_owner' : is_owner
         })
+
+class JoinRequestsView(APIView):
+    def post(self, request, format=None):
+        serializer = JoinRequestCreateSerializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=200)
+
+@api_view(['POST'])
+def search(request):
+    query = request.data.get('query', '')
+
+    if query:
+        organizations = Organization.objects.filter(name__icontains=query)
+        orgs = []
+
+        for org in organizations:
+            if not JoinRequest.objects.filter(org=org, user=request.user).exists():
+                orgs.append(org)
+
+
+        serializer = OrganizationSerializer(orgs, many=True)
+        return Response(serializer.data)
+
+    return Response({'organizations': []})
