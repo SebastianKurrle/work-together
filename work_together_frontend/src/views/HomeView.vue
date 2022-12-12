@@ -11,13 +11,13 @@
       <p v-if="isAuthenticated === false">To start <router-link to="/login">Log In</router-link> or <router-link to="/register">Register</router-link></p>
 
       <div v-else>
-        <h5>Start</h5>
+        <h5>Options</h5>
 
         <router-link to="/organization/create">Create new organization</router-link>
         <br/>
-        <router-link to="/organization/join">Join a organization</router-link>
-        <br/>
         <router-link to="/organizations">Show my organizations</router-link>
+        <br/>
+        <router-link to="/join-requests">Join requests</router-link>
       </div>
     </div>
   </div>

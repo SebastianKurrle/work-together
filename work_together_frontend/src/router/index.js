@@ -1,5 +1,8 @@
+// Other imports
 import { createRouter, createWebHistory } from 'vue-router'
 import store from '@/store'
+
+// Views importing
 
 import HomeView from '../views/HomeView.vue'
 import RegisterView from '../views/RegisterView.vue'
@@ -10,7 +13,9 @@ import OrgsView from '../views/OrgsView.vue'
 import OrgDetailView from '../views/OrgDetailView.vue'
 import WorkspaceDetailView from '../views/WorkspaceDetailView.vue'
 import SearchView from '../views/SearchView.vue'
+import JoinRequestsView from '../views/JoinRequestsView.vue'
 
+// Routes for the Website
 const routes = [
   {
     path: '/',
@@ -75,6 +80,14 @@ const routes = [
     meta: {
       requireLogin: true
     },
+  },
+  {
+    path: '/join-requests',
+    name: 'join-requests',
+    component: JoinRequestsView,
+    meta: {
+      requireLogin: true
+    },
   }
 ]
 
@@ -83,6 +96,7 @@ const router = createRouter({
   routes
 })
 
+// Checks witch route needs an login to continue
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requireLogin) && !store.state.isAuthenticated) {
     next({name: 'login', query: { to: to.path }})

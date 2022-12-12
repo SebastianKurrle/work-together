@@ -54,6 +54,11 @@ class JoinRequestsView(APIView):
         serializer.save()
         return Response(status=200)
 
+    def get(self, request, format=None):
+        pass
+
+
+
 @api_view(['POST'])
 def search(request):
     query = request.data.get('query', '')
@@ -62,8 +67,9 @@ def search(request):
         organizations = Organization.objects.filter(name__icontains=query)
         orgs = []
 
+        # filters the organizations where the user is already in ore have requested it
         for org in organizations:
-            if not JoinRequest.objects.filter(org=org, user=request.user).exists():
+            if not JoinRequest.objects.filter(org=org, user=request.user).exists() and request.user != org.owner:
                 orgs.append(org)
 
 
