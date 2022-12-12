@@ -1,6 +1,7 @@
 from rest_framework import serializers, validators
-from .models import Organization
+from .models import Organization, JoinRequest
 from django.contrib.auth.models import User
+from users.serializers import UserSerializer
 
 class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,3 +21,19 @@ class OrganizationSerializer(serializers.ModelSerializer):
 
         org = Organization.objects.create(name=name, description=desc, org_slug=slug, owner=owner)
         return org
+
+# Handles the serialization for the join requests
+class JoinRequestCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JoinRequest
+        fields = (
+            'org',
+            'user'
+        )
+
+    def create(self, validated_data):
+        org = validated_data.get('org')
+        user = validated_data.get('user')
+        join_request = JoinRequest.objects.create(org=org, user=user)
+        return join_request
+

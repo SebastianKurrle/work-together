@@ -6,7 +6,8 @@
     <div class="border p-3 mb-3">
         <div class="d-flex flex-column">
             <button class="btn btn-success mb-3">Show Chat</button>
-            <button class="btn btn-success" data-bs-target="#uploadFileModal" data-bs-toggle="modal">Upload File</button>
+            <button class="btn btn-success mb-3" data-bs-target="#uploadFileModal" data-bs-toggle="modal">Upload File</button>
+            <button class="btn btn-warning" @click="$router.push(`/organization/${$route.params.org_slug}`)">Back</button>
         </div>
     </div>
 
@@ -137,7 +138,6 @@ export default {
                 .get(`/api/workspace/${this.workspace.id}/file-get/`)
                 .then(response => {
                     this.uploadedFiles = response.data
-                    console.log(this.uploadedFiles)
                 })
                 .catch(error => {
                     console.log(error)

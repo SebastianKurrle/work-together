@@ -27,9 +27,9 @@
               </li>
             </template>
           </ul>
-          <form class="d-flex">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success" type="submit">Search</button>
+          <form class="d-flex" method="get" action="/search">
+            <input class="form-control me-2" type="search" placeholder="Search" name="query" aria-label="Search">
+            <button class="btn btn-outline-success">Search</button>
           </form>
         </div>
       </div>
