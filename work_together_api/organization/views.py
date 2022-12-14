@@ -2,8 +2,10 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import OrganizationSerializer, JoinRequestSerializer
+from users.serializers import UserSerializer
 from .models import Organization, JoinRequest
 from django.http import Http404
+from .permissions import OrganizationIsOwner
 
 class CreateOrganization(APIView):
     def post(self, request, format=None):
@@ -57,9 +59,48 @@ class JoinRequestsUserView(APIView):
     def get(self, request, format=None):
         join_requests = JoinRequest.objects.filter(user=request.user)
         serializer = JoinRequestSerializer(join_requests, many=True)
+        join_requests_serialized = []
 
-        return Response(serializer.data)
+        # Loops the join request to serialize the org and the user for the frontend
+        for join_request in join_requests:
+            org_serializer = OrganizationSerializer(join_request.org)
 
+            join_requests_serialized.append({
+                'join_request_id' : join_request.id,
+                'org' : org_serializer.data,
+            })
+
+        return Response(join_requests_serialized)
+
+    # delete an join request from the user
+    def delete(self, request, req_id, format=None):
+        join_request = JoinRequest.objects.get(id=req_id)
+        join_request.delete() # delete the request from the database
+
+        return Response(status=204)
+
+
+class JoinRequestOwnerView(APIView):
+    # set that it is required that the user is owner of the organization
+    permission_classes = [OrganizationIsOwner]
+    
+    def get(self, request, org_id, format=None):
+        org = Organization.objects.get(id=org_id)
+        join_requests = JoinRequest.objects.filter(org=org)
+        serializer = JoinRequestSerializer(join_requests, many=True)
+        join_requests_serialized = []
+
+        for join_request in join_requests:
+            org_serializer = OrganizationSerializer(join_request.org)
+            user_serializer = UserSerializer(join_request.user)
+
+            join_requests_serialized.append({
+                'join_request_id' : join_request.id,
+                'org' : org_serializer.data,
+                'user' : user_serializer.data
+            })
+
+        return Response(join_requests_serialized)
 
 
 @api_view(['POST'])

@@ -13,7 +13,7 @@
             <div class="card-body">
             <h5 class="card-title">{{ org.name }}</h5>
             <p class="card-text">{{ org.description }}</p>
-            <button class="btn btn-primary" @click="makeJoinRequest(org.id)">Beitritt anfragen</button>
+            <button class="btn btn-primary" @click="makeJoinRequest(org.id)">Make Request</button>
             </div>
         </div>
     </div>

@@ -27,8 +27,14 @@
                     </p>
                 </div>
                 <hr/>
-                <button class="btn btn-success" v-if="isOwner" data-bs-target="#createWorkspaceModal" data-bs-toggle="modal" data-bs-dismiss="modal">Create Workspace</button>
-                <button class="btn btn-danger" v-else data-bs-dismiss="modal">Leave</button>
+                <div v-if="isOwner == false">
+                    <button class="btn btn-success mb-3" data-bs-target="#createWorkspaceModal" data-bs-toggle="modal" data-bs-dismiss="modal">Create Workspace</button>
+                    <br/>
+                    <button class="btn btn-success" @click="getJoinRequests">Join Requests</button>
+                </div>
+                <div v-else>
+                    <button class="btn btn-danger" data-bs-dismiss="modal">Leave</button>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -113,7 +119,7 @@ export default {
                 .get(`api/org/${org_slug}/`)
                 .then(response => {
                     this.org = response.data.org
-                    this.isOwner = response.data.is_owner
+                    //this.isOwner = response.data.is_owner
                     document.title = this.org.name + ' | WorkTogether'
                     this.getWorkspaces()
                 })
@@ -173,6 +179,17 @@ export default {
                 .get(`/api/org/${this.org.id}/workspace/get/`)
                 .then(response => {
                     this.workspaces = response.data
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+        },
+
+        async getJoinRequests() {
+            axios
+                .get(`/api/org/owner/${this.org.id}/join-requests/`)
+                .then(response => {
+                    console.log(response)
                 })
                 .catch(error => {
                     console.log(error)
