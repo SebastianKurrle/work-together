@@ -1,11 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import OrganizationSerializer, JoinRequestSerializer
+from .serializers import OrganizationSerializer, JoinRequestSerializer, OrganizationMemberSerializer
 from users.serializers import UserSerializer
-from .models import Organization, JoinRequest
+from .models import Organization, JoinRequest, OrganizationMember
 from django.http import Http404
-from .permissions import OrganizationIsOwner
 
 class CreateOrganization(APIView):
     def post(self, request, format=None):
@@ -81,26 +80,40 @@ class JoinRequestsUserView(APIView):
 
 
 class JoinRequestOwnerView(APIView):
-    # set that it is required that the user is owner of the organization
-    permission_classes = [OrganizationIsOwner]
-    
+    # To accept an join request
+    def post(self, request, format=None):
+        serializer = OrganizationMemberSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        join_request = JoinRequest.objects.get(id=request.data.get('join_req_id'))
+        join_request.delete()
+
+        return Response(status=201)
+
     def get(self, request, org_id, format=None):
         org = Organization.objects.get(id=org_id)
-        join_requests = JoinRequest.objects.filter(org=org)
-        serializer = JoinRequestSerializer(join_requests, many=True)
-        join_requests_serialized = []
 
-        for join_request in join_requests:
-            org_serializer = OrganizationSerializer(join_request.org)
-            user_serializer = UserSerializer(join_request.user)
+        if org.owner == request.user:
+            join_requests = JoinRequest.objects.filter(org=org)
+            serializer = JoinRequestSerializer(join_requests, many=True)
+            join_requests_serialized = []
 
-            join_requests_serialized.append({
-                'join_request_id' : join_request.id,
-                'org' : org_serializer.data,
-                'user' : user_serializer.data
-            })
+            for join_request in join_requests:
+                org_serializer = OrganizationSerializer(join_request.org)
+                user_serializer = UserSerializer(join_request.user)
 
-        return Response(join_requests_serialized)
+                join_requests_serialized.append({
+                    'join_request_id' : join_request.id,
+                    'org' : org_serializer.data,
+                    'user' : user_serializer.data
+                })
+
+            return Response(join_requests_serialized)
+
+        return Response({
+            'error' : 'You have no permissions',
+        }, status=405)
 
 
 @api_view(['POST'])
@@ -113,7 +126,9 @@ def search(request):
 
         # filters the organizations where the user is already in ore have requested it
         for org in organizations:
-            if not JoinRequest.objects.filter(org=org, user=request.user).exists() and request.user != org.owner:
+            if not JoinRequest.objects.filter(org=org, user=request.user).exists() \
+                    and not OrganizationMember.objects.filter(org=org, user=request.user).exists() \
+                    and request.user != org.owner:
                 orgs.append(org)
 
 

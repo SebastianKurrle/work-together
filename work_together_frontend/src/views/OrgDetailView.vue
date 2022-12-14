@@ -27,10 +27,10 @@
                     </p>
                 </div>
                 <hr/>
-                <div v-if="isOwner == false">
+                <div v-if="isOwner">
                     <button class="btn btn-success mb-3" data-bs-target="#createWorkspaceModal" data-bs-toggle="modal" data-bs-dismiss="modal">Create Workspace</button>
                     <br/>
-                    <button class="btn btn-success" @click="getJoinRequests">Join Requests</button>
+                    <button class="btn btn-success" @click="getJoinRequests" data-bs-target="#joinRequests" data-bs-toggle="modal" data-bs-dismiss="modal">Join Requests</button>
                 </div>
                 <div v-else>
                     <button class="btn btn-danger" data-bs-dismiss="modal">Leave</button>
@@ -72,6 +72,32 @@
         </div>
     </div>
 
+    <div class="modal fade" id="joinRequests" tabindex="-1" role="dialog" aria-labelledby="joinRequestsLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="joinRequestsLabel">Join Requests</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <div class="card mb-3" v-for="req in joinRequests" :key="req.join_request_id">
+                        <div class="card-header">
+                        Request From
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ req.user.username }}</h5>
+                            <button class="btn btn-success m-1" @click="acceptJoinRequest(req.user.id, req.join_request_id)">Accept</button>
+                            <button class="btn btn-danger" @click="denyJoinRequest(req.join_request_id)">Deny</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+
     <div class="border p-3">
         <h5 class="text-center">Organization Workspaces</h5>
 
@@ -107,6 +133,7 @@ export default {
             isOwner: false,
             workspaceName: '',
             workspaceDesc: '',
+            joinRequests: [],
             errors: []
         }
     },
@@ -119,7 +146,7 @@ export default {
                 .get(`api/org/${org_slug}/`)
                 .then(response => {
                     this.org = response.data.org
-                    //this.isOwner = response.data.is_owner
+                    this.isOwner = response.data.is_owner
                     document.title = this.org.name + ' | WorkTogether'
                     this.getWorkspaces()
                 })
@@ -189,10 +216,71 @@ export default {
             axios
                 .get(`/api/org/owner/${this.org.id}/join-requests/`)
                 .then(response => {
-                    console.log(response)
+                    this.joinRequests = response.data
                 })
                 .catch(error => {
                     console.log(error)
+                    Toastify({
+                        text: error.data,
+                        duration: 3000,
+                        close: true,
+                        gravity: "bottom",
+                        position: "right",
+                        stopOnFocus: true,
+
+                        style: {
+                            background: "red",
+                        },
+                    }).showToast();
+                })
+        },
+
+        async acceptJoinRequest(userId, join_req_id) {
+            const formData = {
+                org: this.org.id,
+                user: userId,
+                join_req_id: join_req_id
+            }
+
+            axios
+                .post('/api/org/owner/decide/join-request/', formData)
+                .then(response => {
+                    this.getJoinRequests()
+                    Toastify({
+                        text: 'Request Accepted',
+                        duration: 3000,
+                        close: true,
+                        gravity: "bottom",
+                        position: "right",
+                        stopOnFocus: true,
+
+                        style: {
+                            background: "green",
+                        },
+                    }).showToast();
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+        },
+
+        async denyJoinRequest(joinReqId) {
+            axios
+                .delete(`/api/org/user/delete-request/${joinReqId}/`)
+                .then(response => {
+                    this.getJoinRequests()
+                    Toastify({
+                        text: 'Denied join request',
+                        duration: 3000,
+                        close: true,
+                        gravity: "bottom",
+                        position: "right",
+                        stopOnFocus: true,
+
+                        style: {
+                            background: "red",
+                        },
+                    }).showToast();
                 })
         }
     },
