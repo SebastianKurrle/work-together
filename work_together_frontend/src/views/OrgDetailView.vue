@@ -151,18 +151,33 @@ export default {
                     this.getWorkspaces()
                 })
                 .catch(error => {
-                    Toastify({
-                        text: "Something went wrong",
-                        duration: 3000,
-                        close: true,
-                        gravity: "bottom",
-                        position: "right",
-                        stopOnFocus: true,
+                    if (error.response.status === 403) {
+                        Toastify({
+                            text: "You don`t have permissons",
+                            duration: 3000,
+                            close: true,
+                            gravity: "bottom",
+                            position: "right",
+                            stopOnFocus: true,
 
-                        style: {
-                            background: "red",
-                        },
-                    }).showToast();
+                            style: {
+                                background: "red",
+                            },
+                        }).showToast();
+                    } else {
+                        Toastify({
+                            text: "Something went wrong",
+                            duration: 3000,
+                            close: true,
+                            gravity: "bottom",
+                            position: "right",
+                            stopOnFocus: true,
+
+                            style: {
+                                background: "red",
+                            },
+                        }).showToast();
+                    }
                 })
         },
 

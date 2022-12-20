@@ -5,6 +5,7 @@ from .serializers import OrganizationSerializer, JoinRequestSerializer, Organiza
 from users.serializers import UserSerializer
 from .models import Organization, JoinRequest, OrganizationMember
 from django.http import Http404
+from .permissons import IsMemberOfOrganization
 
 class CreateOrganization(APIView):
     def post(self, request, format=None):
@@ -31,15 +32,28 @@ class GetOrganizations(APIView):
         serializer = OrganizationSerializer(orgs, many=True)
         return Response(serializer.data)
 
+class OrganizationsFromUser(APIView):
+    def get(self, request, format=None):
+        user = request.user
+        # gets all org member objects with the current user
+        user_is_member_of = OrganizationMember.objects.filter(user=user)
+        serializer = OrganizationMemberSerializer(user_is_member_of, many=True)
+
+        return Response(serializer.data)
+
 class DetailOrganization(APIView):
+    permission_classes = [IsMemberOfOrganization]
+
     def get_object(self, org_slug):
         try:
+            #print('test')
             return Organization.objects.get(org_slug=org_slug)
         except:
             raise Http404
     
     def get(self, request, org_slug, format=None):
         org = self.get_object(org_slug)
+        self.check_object_permissions(request, org) # checks if the user is allowed for the organization
         serializer = OrganizationSerializer(org)
         is_owner = request.user.id == org.owner.id
         return Response(data={

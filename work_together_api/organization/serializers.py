@@ -1,6 +1,5 @@
 from rest_framework import serializers, validators
 from .models import Organization, JoinRequest, OrganizationMember
-from django.contrib.auth.models import User
 from users.serializers import UserSerializer
 
 class OrganizationSerializer(serializers.ModelSerializer):
@@ -38,6 +37,9 @@ class JoinRequestSerializer(serializers.ModelSerializer):
         return join_request
 
 class OrganizationMemberSerializer(serializers.ModelSerializer):
+    org = OrganizationSerializer()
+    user = UserSerializer()
+
     class Meta:
         model = OrganizationMember
         fields = (

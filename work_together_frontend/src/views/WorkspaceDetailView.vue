@@ -81,6 +81,22 @@ export default {
                     this.workspace = response.data
                     this.getUploadedFiles()
                 })
+                .catch(error => {
+                    if (error.response.status === 403) {
+                        Toastify({
+                            text: "You don`t have permissons",
+                            duration: 3000,
+                            close: true,
+                            gravity: "bottom",
+                            position: "right",
+                            stopOnFocus: true,
+
+                            style: {
+                                background: "red",
+                            },
+                        }).showToast();
+                    }
+                })
         },
 
         selectFile(event) {
