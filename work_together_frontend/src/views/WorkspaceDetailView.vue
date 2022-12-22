@@ -5,7 +5,7 @@
 
     <div class="border p-3 mb-3">
         <div class="d-flex flex-column">
-            <button class="btn btn-success mb-3">Show Chat</button>
+            <button class="btn btn-success mb-3" data-bs-target="#chatModal" data-bs-toggle="modal">Show Chat</button>
             <button class="btn btn-success mb-3" data-bs-target="#uploadFileModal" data-bs-toggle="modal">Upload File</button>
             <button class="btn btn-warning" @click="$router.push(`/organization/${$route.params.org_slug}`)">Back</button>
         </div>
@@ -30,6 +30,34 @@
                     </div>
 
                     <button class="btn btn-warning" :disabled="file == ''">Upload</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="chatModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="createWorkspaceModal">Chat from {{ workspace.name }}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" @submit.prevent="postMessage">
+                    <input type="text" class="form-control mb-3" placeholder="message" v-model="message">
+
+                    <div
+                        class="bg-danger text-white p-3 mb-3 mt-3 rounded"
+                        v-if="postMessageErrors.length"
+                        >
+                        <p v-for="error in postMessageErrors" :key="error">{{ error }}</p>
+                    </div>
+
+                    <button class="btn btn-primary">Send</button>
                 </form>
             </div>
             <div class="modal-footer">
@@ -66,7 +94,11 @@ export default {
             uploadedFiles: [],
             file: '',
             upload_errors: [],
-            file_desc: ''
+            file_desc: '',
+
+            // chat
+            message: '',
+            postMessageErrors: []
         }
     },
 
@@ -80,6 +112,22 @@ export default {
                 .then(response => {
                     this.workspace = response.data
                     this.getUploadedFiles()
+                })
+                .catch(error => {
+                    if (error.response.status === 403) {
+                        Toastify({
+                            text: "You don`t have permissons",
+                            duration: 3000,
+                            close: true,
+                            gravity: "bottom",
+                            position: "right",
+                            stopOnFocus: true,
+
+                            style: {
+                                background: "red",
+                            },
+                        }).showToast();
+                    }
                 })
         },
 
@@ -158,6 +206,31 @@ export default {
                     document.body.appendChild(fileLink)
 
                     fileLink.click()
+                })
+        },
+
+        async postMessage() {
+            this.postMessageErrors = []
+
+            if (this.message.trim() === '') {
+                this.postMessageErrors.push('Message field is empty')
+                return
+            }
+
+            const formData = {
+                message: this.message,
+                user: parseInt(localStorage.getItem('userId')),
+                workspace: this.workspace.id
+            }
+
+            axios.post('/api/workspace/messages/post/', formData)
+                .then(response => {
+                    console.log(response.data);
+                    this.message = ''
+                })
+                .catch(error => {
+                    console.log(error)
+                    this.postMessageErrors.push(error.response.data)
                 })
         }
     },

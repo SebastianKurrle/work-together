@@ -20,3 +20,10 @@ class JoinRequest(models.Model):
 
     def __str__(self):
         return f'Join {self.org} request from {self.user}'
+
+class OrganizationMember(models.Model):
+    org = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.user} is member of {self.org}'

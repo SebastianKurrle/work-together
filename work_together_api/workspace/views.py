@@ -1,8 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import WorkspaceSerializer, FileUploadSerializer
+from .serializers import WorkspaceSerializer, FileUploadSerializer, ChatMessageCreateSerializer
 from .models import Workspace, FileUpload
 from organization.models import Organization
+from organization.permissons import IsMemberOfOrganization
 
 class CreateWorkspace(APIView):
     def post(self, request, format=None):
@@ -25,8 +26,10 @@ class GetWorkspaces(APIView):
         return Response(serializer.data)
 
 class GetWorkspace(APIView):
+    permission_classes = [IsMemberOfOrganization]
     def get(self, request, org_slug, ws_slug, format=None):
         org = Organization.objects.get(org_slug=org_slug)
+        self.check_object_permissions(request, org)
         workspace = Workspace.objects.get(slug=ws_slug, organization=org)
         serializer = WorkspaceSerializer(workspace)
 
@@ -49,3 +52,12 @@ class UploadFile(APIView):
         serializer = FileUploadSerializer(files_uploads, many=True)
 
         return Response(serializer.data)
+
+class ChatMesssageView(APIView):
+    def post(self, request, format=None):
+        print(request.data)
+        serializer = ChatMessageCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(status=201)
