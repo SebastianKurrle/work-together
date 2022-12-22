@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import OrganizationSerializer, JoinRequestSerializer, OrganizationMemberSerializer
+from .serializers import OrganizationSerializer, JoinRequestSerializer, OrganizationMemberSerializer, OrganizationMemberCreateSerializer
 from users.serializers import UserSerializer
 from .models import Organization, JoinRequest, OrganizationMember
 from django.http import Http404
@@ -96,7 +96,7 @@ class JoinRequestsUserView(APIView):
 class JoinRequestOwnerView(APIView):
     # To accept an join request
     def post(self, request, format=None):
-        serializer = OrganizationMemberSerializer(data=request.data)
+        serializer = OrganizationMemberCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 

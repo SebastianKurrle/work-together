@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import WorkspaceSerializer, FileUploadSerializer
+from .serializers import WorkspaceSerializer, FileUploadSerializer, ChatMessageCreateSerializer
 from .models import Workspace, FileUpload
 from organization.models import Organization
 from organization.permissons import IsMemberOfOrganization
@@ -52,3 +52,12 @@ class UploadFile(APIView):
         serializer = FileUploadSerializer(files_uploads, many=True)
 
         return Response(serializer.data)
+
+class ChatMesssageView(APIView):
+    def post(self, request, format=None):
+        print(request.data)
+        serializer = ChatMessageCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(status=201)

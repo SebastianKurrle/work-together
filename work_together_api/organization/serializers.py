@@ -36,6 +36,20 @@ class JoinRequestSerializer(serializers.ModelSerializer):
         join_request = JoinRequest.objects.create(org=org, user=user)
         return join_request
 
+class OrganizationMemberCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrganizationMember
+        fields = (
+            'org',
+            'user'
+        )
+
+    def create(self, validated_data):
+        org = validated_data.get('org')
+        user = validated_data.get('user')
+        org_member = OrganizationMember.objects.create(org=org, user=user)
+        return org_member
+
 class OrganizationMemberSerializer(serializers.ModelSerializer):
     org = OrganizationSerializer()
     user = UserSerializer()
