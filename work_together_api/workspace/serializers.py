@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Workspace, FileUpload, ChatMessage
 from organization.models import Organization
+from users.serializers import UserSerializer
 
 class WorkspaceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -57,7 +58,18 @@ class ChatMessageCreateSerializer(serializers.ModelSerializer):
         user = validated_data.get('user')
         workspace = validated_data.get('workspace')
 
-        print(user)
-
         chat_message = ChatMessage.objects.create(message=message, user=user, workspace=workspace)
         return chat_message
+
+class ChatMessageSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = ChatMessage
+        fields = (
+            'id',
+            'message',
+            'timestamp',
+            'user',
+            'workspace'
+        )

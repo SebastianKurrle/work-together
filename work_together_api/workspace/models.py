@@ -1,6 +1,7 @@
 from django.db import models
 from organization.models import Organization
 from django.contrib.auth.models import User
+from django.utils import timezone
 import os
 
 class Workspace(models.Model):
@@ -31,6 +32,7 @@ class FileUpload(models.Model):
 
 class ChatMessage(models.Model):
     message = models.TextField()
+    timestamp = models.DateTimeField(default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)
 
