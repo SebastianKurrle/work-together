@@ -5,7 +5,7 @@
 
     <div class="border p-3 mb-3">
         <div class="d-flex flex-column">
-            <button class="btn btn-success mb-3" data-bs-target="#chatModal" data-bs-toggle="modal">Show Chat</button>
+            <button class="btn btn-success mb-3" data-bs-target="#chatModal" data-bs-toggle="modal" @click="startCallChat">Show Chat</button>
             <button class="btn btn-success mb-3" data-bs-target="#uploadFileModal" data-bs-toggle="modal">Upload File</button>
             <button class="btn btn-warning" @click="$router.push(`/organization/${$route.params.org_slug}`)">Back</button>
         </div>
@@ -44,9 +44,13 @@
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="createWorkspaceModal">Chat from {{ workspace.name }}</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="destroyCallChat"></button>
             </div>
             <div class="modal-body">
+                <div class="mb-3">
+                    <ChatMessage v-for="message in chatMessages" :key="message.id" :messageObj="message"/>
+                </div>
+
                 <form method="POST" @submit.prevent="postMessage">
                     <input type="text" class="form-control mb-3" placeholder="message" v-model="message">
 
@@ -61,7 +65,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="destroyCallChat">Close</button>
             </div>
           </div>
         </div>
@@ -84,6 +88,7 @@
 <script>
 import axios from 'axios';
 import Toastify from "toastify-js";
+import ChatMessage from '../components/ChatMessage.vue'
 
 export default {
     name: 'WorkspaceDetailView',
@@ -98,9 +103,15 @@ export default {
 
             // chat
             message: '',
-            postMessageErrors: []
+            chatMessages: [],
+            postMessageErrors: [],
+            chatCallTimer: 0
         }
     },
+
+    components: {
+        ChatMessage
+    }, 
 
     methods: {
         async getWorkspace() {
@@ -112,6 +123,7 @@ export default {
                 .then(response => {
                     this.workspace = response.data
                     this.getUploadedFiles()
+                    this.getChatMessages()
                 })
                 .catch(error => {
                     if (error.response.status === 403) {
@@ -232,6 +244,24 @@ export default {
                     console.log(error)
                     this.postMessageErrors.push(error.response.data)
                 })
+        },
+
+        async getChatMessages() {
+            axios.get(`/api/workspace/${this.workspace.id}/messages/`)
+                .then(response => {
+                    this.chatMessages = response.data
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+        },
+
+        startCallChat() {
+            this.chatCallTimer = setInterval(this.getChatMessages, 1000)
+        },
+
+        destroyCallChat() {
+            clearInterval(this.chatCallTimer)
         }
     },
 
