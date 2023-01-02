@@ -47,7 +47,7 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="destroyCallChat"></button>
             </div>
             <div class="modal-body">
-                <div class="mb-3">
+                <div class="mb-3" id="chat">
                     <ChatMessage v-for="message in chatMessages" :key="message.id" :messageObj="message"/>
                 </div>
 
