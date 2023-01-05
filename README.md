@@ -20,8 +20,11 @@ Ist man Mitglied der Organisation kann man auf alle Workspaces zugreifen und Dat
 > Frontend:
 
 - VueJs
+- Axios für die Komunikation zum Backend
+- Bootstrap
 
 > Backend
 
 - Django
 - Django Restframework
+- Knox Authentication Token
