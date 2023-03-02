@@ -28,3 +28,6 @@ Ist man Mitglied der Organisation kann man auf alle Workspaces zugreifen und Dat
 - Django
 - Django Restframework
 - Knox Authentication Token
+
+**Link zur Seite**
+https://work-together.sebastiankurrle-projects.de
